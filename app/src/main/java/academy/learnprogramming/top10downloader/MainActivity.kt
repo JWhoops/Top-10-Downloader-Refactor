@@ -1,7 +1,6 @@
 package academy.learnprogramming.top10downloader
 
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log

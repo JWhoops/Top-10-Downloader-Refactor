@@ -4,6 +4,8 @@ apply plugin: 'kotlin-android'
 
 apply plugin: 'kotlin-android-extensions'
 
+apply plugin: 'kotlin-kapt' // kotlin dagger module
+
 android {
     compileSdkVersion 29
     defaultConfig {
@@ -30,10 +32,60 @@ android {
 }
 
 dependencies {
+
     // ViewModel and LiveData
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
     implementation 'androidx.fragment:fragment-ktx:1.3.0-alpha06'
-    implementation"org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    // Retrofit
+    def retrofitVersion = "2.5.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+
+    // ViewModel and LiveData
+    def lifecycle_version = '2.2.0'
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+
+    // Dagger
+    def dagger_version = "2.22"
+//    def dagger_version = "2.16" // version used by google samples
+
+    // Dagger2 core
+    implementation "com.google.dagger:dagger:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-compiler:$dagger_version"
+
+    // Dagger Android
+    implementation "com.google.dagger:dagger-android:$dagger_version"
+    implementation "com.google.dagger:dagger-android-support:$dagger_version"
+    annotationProcessor "com.google.dagger:dagger-android-processor:$dagger_version"
+
+    //Dagger Kotlin
+    kapt "com.google.dagger:dagger-compiler:$dagger_version"
+
+    // Room
+    def room_version = "2.3.0-alpha01" // alpha06 has bugs
+    implementation "androidx.room:room-runtime:$room_version"
+    implementation "androidx.room:room-rxjava2:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    // RxAndroid
+    def rxandroid_version = '2.1.1'
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroid_version"
+
+    // RxJava
+    def rxjava_version = '2.1.1'
+    implementation "io.reactivex.rxjava2:rxjava:$rxjava_version"
+
+    // Rx-Retrofit Call Adapter
+    def rxcalladapter_version = '2.5.0'
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$rxcalladapter_version"
+    // Retrofit call adapter
+
+    // Reactive Streams (convert Observable to LiveData)
+    def reactivestreams_version = "1.1.1"
+    implementation "android.arch.lifecycle:reactivestreams:$reactivestreams_version"
+
 }
