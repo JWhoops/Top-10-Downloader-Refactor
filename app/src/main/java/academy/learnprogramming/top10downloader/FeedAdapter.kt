@@ -1,5 +1,6 @@
 package academy.learnprogramming.top10downloader
 
+import academy.learnprogramming.top10downloader.ui.FeedEntry
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View

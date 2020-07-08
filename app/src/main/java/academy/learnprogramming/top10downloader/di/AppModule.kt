@@ -9,7 +9,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
 
 
-@Module class AppModule {
+@Module(includes = [ViewModelModule::class])
+class AppModule {
 
     @Singleton
     @Provides

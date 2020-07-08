@@ -1,5 +1,6 @@
 package academy.learnprogramming.top10downloader
 
+import academy.learnprogramming.top10downloader.ui.FeedEntry
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserFactory
 

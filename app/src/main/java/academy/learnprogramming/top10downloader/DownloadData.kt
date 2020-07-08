@@ -1,5 +1,6 @@
 package academy.learnprogramming.top10downloader
 
+import academy.learnprogramming.top10downloader.ui.FeedEntry
 import android.os.AsyncTask
 import android.util.Log
 import java.io.IOException

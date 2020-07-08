@@ -1,13 +1,17 @@
-package academy.learnprogramming.top10downloader
+package academy.learnprogramming.top10downloader.ui
 
+import academy.learnprogramming.top10downloader.FeedAdapter
+import academy.learnprogramming.top10downloader.R
 import androidx.lifecycle.Observer
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.viewModels
+import androidx.lifecycle.ViewModelProvider
+import dagger.android.support.DaggerAppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class FeedEntry {
     var name: String = ""
@@ -22,18 +26,26 @@ private const val TAG = "MainActivity"
 private const val STATE_URL = "feedUrl"
 private const val STATE_LIMIT = "feedLimit"
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : DaggerAppCompatActivity() {
+
+
+    @Inject
+    lateinit var viewModelFactory: ViewModelProvider.Factory
+    private val feedViewModel: FeedViewModel by viewModels {
+        viewModelFactory
+    }
 
     private var feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
     private var feedLimit = 10
-    private val feedViewModel: FeedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "onCreate called")
 
-        val feedAdapter = FeedAdapter(this, R.layout.list_record, EMPTY_FEED_LIST)
+        val feedAdapter = FeedAdapter(this,
+                                      R.layout.list_record,
+                                      EMPTY_FEED_LIST)
         xmlListView.adapter = feedAdapter
 
         if (savedInstanceState != null) {
@@ -42,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         feedViewModel.feedEntries.observe(this,
-                Observer<List<FeedEntry>> { feedEntries -> feedAdapter.setFeedList(feedEntries ?: EMPTY_FEED_LIST) })
+                                          Observer<List<FeedEntry>> { feedEntries -> feedAdapter.setFeedList(feedEntries ?: EMPTY_FEED_LIST) })
 
         feedViewModel.downloadUrl(feedUrl.format(feedLimit))
         Log.d(TAG, "onCreate: done")
@@ -62,11 +74,11 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
         when (item.itemId) {
-            R.id.mnuFree ->
+            R.id.mnuFree           ->
                 feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
-            R.id.mnuPaid ->
+            R.id.mnuPaid           ->
                 feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=%d/xml"
-            R.id.mnuSongs ->
+            R.id.mnuSongs          ->
                 feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=%d/xml"
             R.id.mnu10, R.id.mnu25 -> {
                 if (!item.isChecked) {
@@ -77,8 +89,8 @@ class MainActivity : AppCompatActivity() {
                     Log.d(TAG, "onOptionsItemSelected: ${item.title} feedLimit unchanged")
                 }
             }
-            R.id.mnuRefresh -> feedViewModel.invalidate()
-            else ->
+            R.id.mnuRefresh        -> feedViewModel.invalidate()
+            else                   ->
                 return super.onOptionsItemSelected(item)
         }
         feedViewModel.downloadUrl(feedUrl.format(feedLimit))

@@ -1,10 +1,12 @@
-package academy.learnprogramming.top10downloader
+package academy.learnprogramming.top10downloader.ui
 
+import academy.learnprogramming.top10downloader.DownloadData
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import android.util.Log
 import java.util.*
+import javax.inject.Inject
 
 /**
  * Created by timbuchalka for the Android Oreo using Kotlin course
@@ -14,7 +16,7 @@ private const val TAG = "FeedViewModel"
 
 val EMPTY_FEED_LIST: List<FeedEntry> = Collections.emptyList()
 
-class FeedViewModel : ViewModel(), DownloadData.DownloaderCallBack {
+class FeedViewModel @Inject constructor() : ViewModel(), DownloadData.DownloaderCallBack {
 
     private var downloadData: DownloadData? = null
     private var feedCachedUrl = "INVALIDATED"
@@ -47,7 +49,7 @@ class FeedViewModel : ViewModel(), DownloadData.DownloaderCallBack {
     override fun onDataAvailable(data: List<FeedEntry>) {
         Log.d(TAG, "onDataAvailable called")
         feed.value = data
-        Log.d(TAG,"onDataAvailable ends")
+        Log.d(TAG, "onDataAvailable ends")
     }
 
     override fun onCleared() {
