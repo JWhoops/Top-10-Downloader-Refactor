@@ -1,7 +1,8 @@
 package academy.learnprogramming.top10downloader.ui
 
-import academy.learnprogramming.top10downloader.FeedAdapter
+import academy.learnprogramming.top10downloader.FeedAdapter1
 import academy.learnprogramming.top10downloader.R
+import academy.learnprogramming.top10downloader.models.Entry
 import androidx.lifecycle.Observer
 import android.os.Bundle
 import android.util.Log
@@ -25,9 +26,10 @@ class FeedEntry {
 private const val TAG = "MainActivity"
 private const val STATE_URL = "feedUrl"
 private const val STATE_LIMIT = "feedLimit"
+private const val STATE_TYPE = "feedType"
+private const val STATE_CATEGORY = "feedCategory"
 
 class MainActivity : DaggerAppCompatActivity() {
-
 
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
@@ -35,31 +37,28 @@ class MainActivity : DaggerAppCompatActivity() {
         viewModelFactory
     }
 
-
-
-    private var feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
     private var feedLimit = 10
+    private var feedType = "ios-apps"
+    private var feedCategory = "free"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "onCreate called")
 
-        val feedAdapter = FeedAdapter(this,
-                                      R.layout.list_record,
-                                      EMPTY_FEED_LIST)
-        xmlListView.adapter = feedAdapter
+        val feedAdapter1 = FeedAdapter1(this, R.layout.list_record, EMPTY_FEED_LIST1)
+        xmlListView.adapter = feedAdapter1
 
         if (savedInstanceState != null) {
-            feedUrl = savedInstanceState.getString(STATE_URL).toString()
+            feedType = savedInstanceState.getString(STATE_TYPE).toString()
+            feedCategory = savedInstanceState.getString(STATE_CATEGORY).toString()
             feedLimit = savedInstanceState.getInt(STATE_LIMIT)
         }
 
-        feedViewModel.feedEntries.observe(this,
-                                          Observer<List<FeedEntry>> { feedEntries -> feedAdapter.setFeedList(feedEntries ?: EMPTY_FEED_LIST) })
+        feedViewModel.getFeed("ios-apps", "free", feedLimit)
 
-        feedViewModel.downloadUrl(feedUrl.format(feedLimit))
-        Log.d(TAG, "onCreate: done")
+        feedViewModel.feedEntries1.observe(this,
+                                           Observer<List<Entry>> { feedEntries1 -> feedAdapter1.setFeedList(feedEntries1 ?: EMPTY_FEED_LIST1) })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -74,34 +73,37 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
         when (item.itemId) {
-            R.id.mnuFree           ->
-                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
-            R.id.mnuPaid           ->
-                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/toppaidapplications/limit=%d/xml"
-            R.id.mnuSongs          ->
-                feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topsongs/limit=%d/xml"
+            R.id.mnuFree           -> {
+                feedType = "ios-apps"
+                feedCategory = "free"
+            }
+            R.id.mnuPaid           -> {
+                feedType = "ios-apps"
+                feedCategory = "paid"
+            }
+            R.id.mnuSongs          -> {
+                feedType = "apple-music"
+                feedCategory = "songs"
+            }
             R.id.mnu10, R.id.mnu25 -> {
                 if (!item.isChecked) {
                     item.isChecked = true
                     feedLimit = 35 - feedLimit
-                    Log.d(TAG, "onOptionsItemSelected: ${item.title} setting feedLimit to $feedLimit")
-                } else {
-                    Log.d(TAG, "onOptionsItemSelected: ${item.title} feedLimit unchanged")
                 }
             }
             R.id.mnuRefresh        -> feedViewModel.invalidate()
             else                   ->
                 return super.onOptionsItemSelected(item)
         }
-        feedViewModel.downloadUrl(feedUrl.format(feedLimit))
+        feedViewModel.getFeed(feedType, feedCategory, feedLimit)
         return true
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(STATE_URL, feedUrl)
+        outState.putString(STATE_TYPE, feedType)
+        outState.putString(STATE_CATEGORY, feedCategory)
         outState.putInt(STATE_LIMIT, feedLimit)
     }
 }

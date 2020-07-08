@@ -1,12 +1,11 @@
 package academy.learnprogramming.top10downloader.ui
 
 import academy.learnprogramming.top10downloader.DownloadData
+import academy.learnprogramming.top10downloader.models.Entry
 import academy.learnprogramming.top10downloader.network.FeedAPI
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
@@ -19,6 +18,7 @@ import javax.inject.Inject
 private const val TAG = "FeedViewModel"
 
 val EMPTY_FEED_LIST: List<FeedEntry> = Collections.emptyList()
+val EMPTY_FEED_LIST1: List<Entry> = Collections.emptyList()
 
 class FeedViewModel @Inject constructor(feedAPI: FeedAPI) : ViewModel(), DownloadData.DownloaderCallBack {
 
@@ -27,17 +27,31 @@ class FeedViewModel @Inject constructor(feedAPI: FeedAPI) : ViewModel(), Downloa
     private var feedCachedUrl = "INVALIDATED"
 
     private val feed = MutableLiveData<List<FeedEntry>>()
+    private val feed1 = MutableLiveData<List<Entry>>()
+    private var feedAPI: FeedAPI? = null
+
     val feedEntries: LiveData<List<FeedEntry>>
         get() = feed
 
-     init {
+    val feedEntries1: LiveData<List<Entry>>
+        get() = feed1
+
+    init {
+        this.feedAPI = feedAPI
         feed.postValue(EMPTY_FEED_LIST)
-        feedAPI.getResults(10)
+        feed1.postValue(EMPTY_FEED_LIST1)
+    }
+
+    @SuppressLint("CheckResult")
+    fun getFeed(type: String, category: String, limit: Int) {
+        feedAPI!!.getTopList(type, category, limit)
                 .toObservable()
                 .subscribeOn(Schedulers.io())
                 .subscribe(
-                    { results -> Log.d(TAG, "result result result ${results}") },
-                    {throwable -> Log.d(TAG, "error error error $throwable")}
+                        { feedResponse ->
+                            feed1.postValue(feedResponse.feed.results)
+                        },
+                        { throwable -> Log.d(TAG, "error error error $throwable") }
                 )
     }
 
