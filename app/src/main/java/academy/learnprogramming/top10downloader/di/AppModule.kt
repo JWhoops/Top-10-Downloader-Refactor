@@ -1,5 +1,6 @@
 package academy.learnprogramming.top10downloader.di
 
+import academy.learnprogramming.top10downloader.network.FeedAPI
 import academy.learnprogramming.top10downloader.util.Constants
 import dagger.Module
 import dagger.Provides
@@ -16,9 +17,17 @@ class AppModule {
     @Provides
     fun provideRetrofitInstance(): Retrofit {
         return Retrofit.Builder()
-                .baseUrl(Constants.BASE_URL)
+                .baseUrl(Constants.FEED_URL)
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
     }
+
+    @Singleton
+    @Provides
+    fun provideFeedApi(retrofit: Retrofit): FeedAPI {
+        return retrofit.create(FeedAPI::class.java)
+    }
+
+
 }

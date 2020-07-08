@@ -1,12 +1,16 @@
 package academy.learnprogramming.top10downloader.ui
 
 import academy.learnprogramming.top10downloader.DownloadData
+import academy.learnprogramming.top10downloader.network.FeedAPI
+import android.annotation.SuppressLint
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import android.util.Log
+import io.reactivex.schedulers.Schedulers
 import java.util.*
 import javax.inject.Inject
+
 
 /**
  * Created by timbuchalka for the Android Oreo using Kotlin course
@@ -16,7 +20,8 @@ private const val TAG = "FeedViewModel"
 
 val EMPTY_FEED_LIST: List<FeedEntry> = Collections.emptyList()
 
-class FeedViewModel @Inject constructor() : ViewModel(), DownloadData.DownloaderCallBack {
+class FeedViewModel @Inject constructor(feedAPI: FeedAPI) : ViewModel(), DownloadData.DownloaderCallBack {
+
 
     private var downloadData: DownloadData? = null
     private var feedCachedUrl = "INVALIDATED"
@@ -25,9 +30,17 @@ class FeedViewModel @Inject constructor() : ViewModel(), DownloadData.Downloader
     val feedEntries: LiveData<List<FeedEntry>>
         get() = feed
 
-    init {
+     init {
         feed.postValue(EMPTY_FEED_LIST)
+        feedAPI.getResults(10)
+                .toObservable()
+                .subscribeOn(Schedulers.io())
+                .subscribe(
+                    { results -> Log.d(TAG, "result result result ${results}") },
+                    {throwable -> Log.d(TAG, "error error error $throwable")}
+                )
     }
+
 
     fun downloadUrl(feedUrl: String) {
         Log.d(TAG, "downloadUrl: called with url $feedUrl")

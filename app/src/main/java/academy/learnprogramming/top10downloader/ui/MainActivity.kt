@@ -35,6 +35,8 @@ class MainActivity : DaggerAppCompatActivity() {
         viewModelFactory
     }
 
+
+
     private var feedUrl = "http://ax.itunes.apple.com/WebObjects/MZStoreServices.woa/ws/RSS/topfreeapplications/limit=%d/xml"
     private var feedLimit = 10
 
