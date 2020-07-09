@@ -57,8 +57,11 @@ class MainActivity : DaggerAppCompatActivity() {
 
         feedViewModel.getFeed("ios-apps", "free", feedLimit)
 
-        feedViewModel.feedEntries1.observe(this,
-                                           Observer<List<Entry>> { feedEntries1 -> feedAdapter1.setFeedList(feedEntries1 ?: EMPTY_FEED_LIST1) })
+//        feedViewModel.feedEntries1.observe(this,
+//                                           Observer<List<Entry>> { feedEntries1 -> feedAdapter1.setFeedList(feedEntries1 ?: EMPTY_FEED_LIST1) })
+
+        feedViewModel.feedEntries2.observe(this,
+                                           Observer<List<Entry>> { feedEntries2 -> feedAdapter1.setFeedList(feedEntries2 ?: EMPTY_FEED_LIST1) })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

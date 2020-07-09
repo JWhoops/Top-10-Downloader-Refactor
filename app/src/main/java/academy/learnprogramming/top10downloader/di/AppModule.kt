@@ -1,7 +1,11 @@
 package academy.learnprogramming.top10downloader.di
 
+import academy.learnprogramming.top10downloader.db.EntryDB
+import academy.learnprogramming.top10downloader.db.dao.EntryDao
 import academy.learnprogramming.top10downloader.network.FeedAPI
 import academy.learnprogramming.top10downloader.util.Constants
+import android.app.Application
+import androidx.room.Room
 import dagger.Module
 import dagger.Provides
 import retrofit2.Retrofit
@@ -13,6 +17,7 @@ import javax.inject.Singleton
 @Module(includes = [ViewModelModule::class])
 class AppModule {
 
+
     @Singleton
     @Provides
     fun provideRetrofitInstance(): Retrofit {
@@ -23,11 +28,26 @@ class AppModule {
                 .build()
     }
 
+    // TODO fix scope issue
     @Singleton
     @Provides
     fun provideFeedApi(retrofit: Retrofit): FeedAPI {
         return retrofit.create(FeedAPI::class.java)
     }
 
+    @Singleton
+    @Provides
+    fun provideDb(app: Application): EntryDB {
+        return Room
+                .databaseBuilder(app, EntryDB::class.java, "entry.db")
+                .fallbackToDestructiveMigration()
+                .build()
+    }
+
+    @Singleton
+    @Provides
+    fun provideUserDao(db: EntryDB): EntryDao {
+        return db.entryDao()
+    }
 
 }
