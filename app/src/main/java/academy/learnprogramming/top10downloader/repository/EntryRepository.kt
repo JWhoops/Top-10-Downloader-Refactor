@@ -2,16 +2,11 @@ package academy.learnprogramming.top10downloader.repository
 
 import academy.learnprogramming.top10downloader.db.dao.EntryDao
 import academy.learnprogramming.top10downloader.db.entity.Entry
-import academy.learnprogramming.top10downloader.di.MainScope
 import academy.learnprogramming.top10downloader.network.FeedAPI
 import academy.learnprogramming.top10downloader.util.Constants
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.Observer
-import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject

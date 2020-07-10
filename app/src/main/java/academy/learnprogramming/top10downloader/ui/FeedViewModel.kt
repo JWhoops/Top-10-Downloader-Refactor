@@ -2,12 +2,9 @@ package academy.learnprogramming.top10downloader.ui
 
 import academy.learnprogramming.top10downloader.db.entity.Entry
 import academy.learnprogramming.top10downloader.repository.EntryRepository
-import android.util.Log
 import androidx.lifecycle.*
 import java.util.*
 import javax.inject.Inject
-
-private const val TAG = "FeedViewModel"
 
 val EMPTY_FEED_LIST: List<Entry> = Collections.emptyList()
 
@@ -36,7 +33,7 @@ class FeedViewModel @Inject constructor(private val entryRepo: EntryRepository) 
     }
 
     override fun onCleared() {
-        Log.d(TAG, "onCleared: cancelling pending downloads")
-//        downloadData?.cancel(true)
+        // how to cancel downloading?
+        // memory leak
     }
 }

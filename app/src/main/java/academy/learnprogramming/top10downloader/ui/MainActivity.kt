@@ -21,7 +21,6 @@ private const val STATE_CATEGORY = "feedCategory"
 
 class MainActivity : DaggerAppCompatActivity() {
 
-
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
     private val feedViewModel: FeedViewModel by viewModels {
@@ -49,8 +48,8 @@ class MainActivity : DaggerAppCompatActivity() {
 
         feedViewModel.getFeed(feedType, feedCategory, feedLimit)
         feedViewModel.feedEntries.observe(this,
-                                          Observer<List<Entry>> { feedEntries2 ->
-                                              feedAdapter.setFeedList(feedEntries2 ?: EMPTY_FEED_LIST)
+                                          Observer<List<Entry>> { feedEntries ->
+                                              feedAdapter.setFeedList(feedEntries ?: EMPTY_FEED_LIST)
                                           })
     }
 
