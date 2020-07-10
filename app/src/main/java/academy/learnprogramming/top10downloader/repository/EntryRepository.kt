@@ -1,43 +1,49 @@
 package academy.learnprogramming.top10downloader.repository
 
-import academy.learnprogramming.top10downloader.db.EntryDB
 import academy.learnprogramming.top10downloader.db.dao.EntryDao
 import academy.learnprogramming.top10downloader.db.entity.Entry
+import academy.learnprogramming.top10downloader.di.MainScope
 import academy.learnprogramming.top10downloader.network.FeedAPI
+import academy.learnprogramming.top10downloader.util.Constants
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.Observer
+import io.reactivex.Observable
+import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 import javax.inject.Singleton
 
 
-private const val TAG = "EntryRepository"
-
 @Singleton
 class EntryRepository @Inject constructor(
-        private val repoDao: EntryDao,
+        private val entryDao: EntryDao,
         private val feedAPI: FeedAPI
 ) {
-    val feedData = MediatorLiveData<List<Entry>>()
+    private val feedData = MediatorLiveData<List<Entry>>()
+
+    val feed: LiveData<List<Entry>>
+        get() = feedData
+
 
     fun getFeed(type: String, category: String, limit: Int) {
-        val cachedSource = repoDao.getFeedBy(type, category, limit)
-        feedData.addSource(cachedSource) { res ->
-            if (res.isEmpty()) {
-                feedAPI.getTopList(type, category, 25).subscribeOn(Schedulers.io()).subscribe { entries ->
-                    val dbEntries: List<Entry> = entries.feed.results.map {
-                        with(it) {
+        val cachedSource = entryDao.getFeedBy(type, category, limit)
+        feedData.addSource(cachedSource) { cachedEntry ->
+            if (cachedEntry.isEmpty()) {
+                feedAPI.getTopList(type, category, Constants.LIMIT_HIGH).subscribeOn(Schedulers.io()).subscribe { entries ->
+                    val dbEntries: List<Entry> = entries.feed.results.map { entry ->
+                        with(entry) {
                             Entry(null, name, artist, release, copyRight, website, type, category)
                         }
                     }
-                    repoDao.insert(dbEntries)
-                    Log.d(TAG, " it's empty ${dbEntries.subList(0, limit)}")
+                    entryDao.insert(dbEntries)
                     feedData.postValue(dbEntries.subList(0, limit))
                 }
             } else {
-                feedData.postValue(res)
-                Log.d(TAG, "nah it's not empty $res")
+                feedData.postValue(cachedEntry)
             }
             feedData.removeSource(cachedSource)
         }
@@ -45,10 +51,9 @@ class EntryRepository @Inject constructor(
 
     @SuppressLint("CheckResult")
     fun clearFeed(type: String, category: String, limit: Int) {
-        // how to asyc better
-        repoDao.deleteAllEntries().subscribeOn(Schedulers.io()).subscribe { _ ->
-            Log.d(TAG, "it is deleted!!!!!")
+        // lol, switch thread
+        entryDao.deleteAllEntries().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe { _ ->
+            getFeed(type, category, limit)
         }
-        getFeed(type, category, limit)
     }
 }

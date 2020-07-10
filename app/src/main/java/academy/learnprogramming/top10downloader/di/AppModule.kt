@@ -17,7 +17,6 @@ import javax.inject.Singleton
 @Module(includes = [ViewModelModule::class])
 class AppModule {
 
-
     @Singleton
     @Provides
     fun provideRetrofitInstance(): Retrofit {
@@ -28,7 +27,6 @@ class AppModule {
                 .build()
     }
 
-    // TODO fix scope issue
     @Singleton
     @Provides
     fun provideFeedApi(retrofit: Retrofit): FeedAPI {
