@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "entry_table")
 data class Entry(
         @PrimaryKey(autoGenerate = true)
-        val id: Int,
+        val id: Int?,
         @ColumnInfo(name = "name")
         val name: String,
         @ColumnInfo(name = "artist_name")
@@ -17,5 +17,9 @@ data class Entry(
         @ColumnInfo(name = "website")
         val website: String,
         @ColumnInfo(name = "copyright")
-        val copyRight: String
+        val copyRight: String,
+        @ColumnInfo(name = "type")
+        val type: String,
+        @ColumnInfo(name = "category")
+        val category: String
 )

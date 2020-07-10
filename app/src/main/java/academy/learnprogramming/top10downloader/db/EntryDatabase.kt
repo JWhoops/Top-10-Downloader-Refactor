@@ -5,7 +5,7 @@ import academy.learnprogramming.top10downloader.db.entity.Entry
 import androidx.room.Database
 import androidx.room.RoomDatabase
 
-@Database(entities = [Entry::class], version = 1)
+@Database(entities = [Entry::class], version = 3)
 abstract class EntryDB : RoomDatabase() {
     abstract fun entryDao(): EntryDao
 }

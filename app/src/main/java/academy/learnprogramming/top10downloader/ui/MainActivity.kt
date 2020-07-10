@@ -1,6 +1,7 @@
 package academy.learnprogramming.top10downloader.ui
 
 import academy.learnprogramming.top10downloader.FeedAdapter1
+import academy.learnprogramming.top10downloader.FeedAdapter2
 import academy.learnprogramming.top10downloader.R
 import academy.learnprogramming.top10downloader.models.Entry
 import androidx.lifecycle.Observer
@@ -46,8 +47,8 @@ class MainActivity : DaggerAppCompatActivity() {
         setContentView(R.layout.activity_main)
         Log.d(TAG, "onCreate called")
 
-        val feedAdapter1 = FeedAdapter1(this, R.layout.list_record, EMPTY_FEED_LIST1)
-        xmlListView.adapter = feedAdapter1
+        val feedAdapter2 = FeedAdapter2(this, R.layout.list_record, EMPTY_FEED_LIST2)
+        xmlListView.adapter = feedAdapter2
 
         if (savedInstanceState != null) {
             feedType = savedInstanceState.getString(STATE_TYPE).toString()
@@ -61,7 +62,9 @@ class MainActivity : DaggerAppCompatActivity() {
 //                                           Observer<List<Entry>> { feedEntries1 -> feedAdapter1.setFeedList(feedEntries1 ?: EMPTY_FEED_LIST1) })
 
         feedViewModel.feedEntries2.observe(this,
-                                           Observer<List<Entry>> { feedEntries2 -> feedAdapter1.setFeedList(feedEntries2 ?: EMPTY_FEED_LIST1) })
+                                           Observer<List<academy.learnprogramming.top10downloader.db.entity.Entry>> { feedEntries2 ->
+                                               feedAdapter2.setFeedList(feedEntries2 ?: EMPTY_FEED_LIST2)
+                                           })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -76,6 +79,7 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        var refresh = false
         when (item.itemId) {
             R.id.mnuFree           -> {
                 feedType = "ios-apps"
@@ -95,11 +99,15 @@ class MainActivity : DaggerAppCompatActivity() {
                     feedLimit = 35 - feedLimit
                 }
             }
-            R.id.mnuRefresh        -> feedViewModel.invalidate()
+            R.id.mnuRefresh        -> refresh = true
             else                   ->
                 return super.onOptionsItemSelected(item)
         }
-        feedViewModel.getFeed(feedType, feedCategory, feedLimit)
+        if (refresh) {
+            feedViewModel.clearFeedBy(feedType, feedCategory, feedLimit)
+        } else {
+            feedViewModel.getFeed(feedType, feedCategory, feedLimit)
+        }
         return true
     }
 

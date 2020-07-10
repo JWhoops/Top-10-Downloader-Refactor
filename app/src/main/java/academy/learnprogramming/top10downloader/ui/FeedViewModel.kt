@@ -21,8 +21,9 @@ private const val TAG = "FeedViewModel"
 
 val EMPTY_FEED_LIST: List<FeedEntry> = Collections.emptyList()
 val EMPTY_FEED_LIST1: List<Entry> = Collections.emptyList()
+val EMPTY_FEED_LIST2: List<academy.learnprogramming.top10downloader.db.entity.Entry> = Collections.emptyList()
 
-class FeedViewModel @Inject constructor(var feedAPI: FeedAPI, var entryRepo: EntryRepository) : ViewModel(), DownloadData.DownloaderCallBack {
+class FeedViewModel @Inject constructor(private val entryRepo: EntryRepository) : ViewModel(), DownloadData.DownloaderCallBack {
 
 
     private var downloadData: DownloadData? = null
@@ -30,7 +31,7 @@ class FeedViewModel @Inject constructor(var feedAPI: FeedAPI, var entryRepo: Ent
 
     private val feed = MutableLiveData<List<FeedEntry>>()
     private val feed1 = MutableLiveData<List<Entry>>()
-    private val feed2 = MediatorLiveData<List<Entry>>()
+    private val feed2 = MediatorLiveData<List<academy.learnprogramming.top10downloader.db.entity.Entry>>()
 
     val feedEntries: LiveData<List<FeedEntry>>
         get() = feed
@@ -38,33 +39,25 @@ class FeedViewModel @Inject constructor(var feedAPI: FeedAPI, var entryRepo: Ent
     val feedEntries1: LiveData<List<Entry>>
         get() = feed1
 
-    val feedEntries2: LiveData<List<Entry>>
+    val feedEntries2: LiveData<List<academy.learnprogramming.top10downloader.db.entity.Entry>>
         get() = feed2
 
     init {
         feed.postValue(EMPTY_FEED_LIST)
         feed1.postValue(EMPTY_FEED_LIST1)
-        feed2.postValue(EMPTY_FEED_LIST1)
+        feed2.postValue(EMPTY_FEED_LIST2)
+        feed2.addSource(entryRepo.feedData) { res ->
+            Log.d(TAG, "here is the fucking response $res")
+            feed2.postValue(res)
+        }
     }
 
-    @SuppressLint("CheckResult")
     fun getFeed(type: String, category: String, limit: Int) {
-//        feedAPI.getTopList(type, category, limit)
-//                .toObservable()
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(
-//                        { feedResponse ->
-//                            feed1.postValue(feedResponse.feed.results)
-//                        },
-//                        { throwable -> Log.d(TAG, "error error error $throwable") }
-//                )
+        entryRepo.getFeed(type, category, limit)
+    }
 
-        val source: LiveData<FeedResponse> = entryRepo.getFeed(type, category, limit)
-        feed2.addSource(source) { response ->
-            Log.d(TAG, "here is the fucking response $response")
-            feed2.postValue(response.feed.results)
-            feed2.removeSource(source)
-        }
+    fun clearFeedBy(type: String, category: String, limit: Int) {
+        entryRepo.clearFeed(type, category, limit)
     }
 
 
